@@ -20,10 +20,10 @@ public class Particle {
     public Particle() {
         this.px = 0.5d;
         this.py = 0.5d;
-        this.vx = Math.random() - 0.5d;
-        this.vy = Math.random() - 0.5d;
-        this.r = 0.05d;
-        this.mass = 0.75d * Math.PI * Math.pow(this.r, 3);
+        this.vx = Math.random() * 0.01d - 0.005d;
+        this.vy = Math.random() * 0.01d - 0.005d;
+        this.r = 0.02d;
+        this.mass = 0.5d;
     }
 
     void draw() {
@@ -50,30 +50,40 @@ public class Particle {
     }
 
     double timeToHitHorizontalWall() {
-        double t = (Math.abs(this.py) - this.r) / this.vy;
-        return t < 0 ? Double.MAX_VALUE : t;
+        if (vy > 0) {
+            return (1.0d - r - py) / vy;
+        } else if (vy < 0) {
+            return (r - py) / vy;
+        } else {
+            return Double.POSITIVE_INFINITY;
+        }
     }
 
     double timeToHitVerticalWall() {
-        double t = (Math.abs(this.px) - this.r) / this.vx;
-        return t < 0 ? Double.MAX_VALUE : t;
+        if (vx > 0) {
+            return (1.0d - r - px) / vx;
+        } else if (vx < 0) {
+            return (r - px) / vx;
+        } else {
+            return Double.POSITIVE_INFINITY;
+        }
     }
 
     //TODO
     double bounceOff(Particle p) {
-        return 0.0d;
+        return Double.POSITIVE_INFINITY;
     }
 
-    //TODO
     double bounceOffHorizontalWall() {
         this.vy = -this.vy;
+        this.count++;
         return this.vy;
     }
 
-    //TODO
     double bounceOffVerticalWall() {
         this.vx = -this.vx;
-        return this.vx;
+        this.count++;
+        return this.vy;
     }
 
     public double getPx() {
