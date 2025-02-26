@@ -41,12 +41,36 @@ public class Particle {
         return count;
     }
 
-    //TODO
-    double timeToHit(Particle p) {
-        if (this == p) {
-            return Double.MAX_VALUE;
+    double timeToHit(Particle that) {
+        if (this == that) {
+            return Double.POSITIVE_INFINITY;
         }
-        return Double.POSITIVE_INFINITY;
+        double distanceX = this.px - that.px;
+        double distanceY = this.py - that.py;
+        double velocityX = this.vx - that.vx;
+        double velocityY = this.vy - that.vy;
+        double innerProductOfDistanceAndVelocity = distanceX * velocityX + distanceY * velocityY;
+        if (innerProductOfDistanceAndVelocity >= 0.0d) {
+            return Double.POSITIVE_INFINITY;
+        }
+
+        double velocity = velocityX * velocityX + velocityY * velocityY;
+        if (velocity == 0) {
+            return Double.POSITIVE_INFINITY;
+        }
+        double distance = distanceX * distanceX + distanceY * distanceY;
+        double sigma = this.r + that.r;
+        // d = (dvdr)² - dvdv * (drdr - sigma²)
+        double discriminant = innerProductOfDistanceAndVelocity * innerProductOfDistanceAndVelocity - velocity * (distance - sigma * sigma);
+        if (discriminant < 0) {
+            return Double.POSITIVE_INFINITY;
+        }
+        // t = (-dvdr - sqrt(d)) / dvdv
+        double time = - ((innerProductOfDistanceAndVelocity) + Math.sqrt(discriminant)) / velocity;
+        if (time <= 0) {
+            return Double.POSITIVE_INFINITY;
+        }
+        return time;
     }
 
     double timeToHitHorizontalWall() {
@@ -70,7 +94,7 @@ public class Particle {
     }
 
     //TODO
-    double bounceOff(Particle p) {
+    double bounceOff(Particle that) {
         return Double.POSITIVE_INFINITY;
     }
 
