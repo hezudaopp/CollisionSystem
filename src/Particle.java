@@ -1,4 +1,9 @@
+import java.awt.*;
+
 public class Particle {
+    private static int autoincrementId = 0;
+
+    private int id;
     private double px;
     private double py;
     private double vx;
@@ -15,19 +20,26 @@ public class Particle {
         this.vy = vy;
         this.r = r;
         this.mass = mass;
+
+        this.id = ++autoincrementId;
     }
 
     public Particle() {
-        this.px = 0.5d;
-        this.py = 0.5d;
+        this.px = Math.random();
+        this.py = Math.random();
         this.vx = Math.random() * 0.01d - 0.005d;
         this.vy = Math.random() * 0.01d - 0.005d;
         this.r = 0.02d;
         this.mass = 0.5d;
+
+        this.id = ++autoincrementId;
     }
 
     void draw() {
+        StdDraw.setPenColor(Color.BLACK);
         StdDraw.filledCircle(px, py, r);
+        StdDraw.setPenColor(Color.WHITE);
+        StdDraw.text(px, py, String.valueOf(id));
     }
 
     void move(double dt) {
@@ -94,20 +106,38 @@ public class Particle {
     }
 
     //TODO
-    double bounceOff(Particle that) {
-        return Double.POSITIVE_INFINITY;
+    void bounceOff(Particle that) {
+        double distanceX = that.px - this.px;
+        double distanceY = that.py - this.py;
+        double velocityX = that.vx - this.vx;
+        double velocityY = that.vy - this.vy;
+        double innerProductOfDistanceAndVelocity = distanceX * velocityX + distanceY * velocityY;
+        double dist = this.r + that.r;
+        // magnitude = 2 * m1 * m2 * dvdr / ((m1 + m2) * dist)
+        double magnitude = 2 * this.mass * that.mass * innerProductOfDistanceAndVelocity / ((this.mass + that.mass) * dist);
+        // normal force, and in x and y directions
+        double fx = magnitude * distanceX / dist;
+        double fy = magnitude * distanceY / dist;
+
+        // update velocities according to normal force
+        this.vx += fx / this.mass;
+        this.vy += fy / this.mass;
+        that.vx -= fx / that.mass;
+        that.vy -= fy / that.mass;
+
+        // update collision counts
+        this.count++;
+        that.count++;
     }
 
-    double bounceOffHorizontalWall() {
+    void bounceOffHorizontalWall() {
         this.vy = -this.vy;
         this.count++;
-        return this.vy;
     }
 
-    double bounceOffVerticalWall() {
+    void bounceOffVerticalWall() {
         this.vx = -this.vx;
         this.count++;
-        return this.vy;
     }
 
     public double getPx() {

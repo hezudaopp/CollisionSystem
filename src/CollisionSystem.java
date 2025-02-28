@@ -69,7 +69,7 @@ public class CollisionSystem {
             p.draw();
         }
         StdDraw.show();
-//        StdDraw.pause(20);
+        StdDraw.pause(20);
 
         if (this.t < limit) {
             pq.insert(new Event(t + 1.0/Hz, null, null));
